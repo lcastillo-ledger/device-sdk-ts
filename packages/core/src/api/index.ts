@@ -32,10 +32,10 @@ export { DeviceSdk } from "./DeviceSdk";
 export { LedgerDeviceSdkBuilder as DeviceSdkBuilder } from "./DeviceSdkBuilder";
 export { LogLevel } from "./logger-subscriber/model/LogLevel";
 export { ConsoleLogger } from "./logger-subscriber/service/ConsoleLogger";
-export { BuiltinTransport } from "./transport/model/BuiltinTransport";
-export { ConnectedDevice } from "./transport/model/ConnectedDevice";
 export * from "./types";
 export { InvalidStatusWordError } from "@api/command/Errors";
+export { ConnectedDevice } from "./transport/model/ConnectedDevice";
+export { BuiltinTransports } from "./transport/model/TransportIdentifier";
 export {
   type DeviceAction,
   type DeviceActionIntermediateValue,

@@ -13,7 +13,6 @@ import {
 import { ApduResponse } from "@api/device-session/ApduResponse";
 import { DeviceSessionState } from "@api/device-session/DeviceSessionState";
 import { DeviceSessionId } from "@api/device-session/types";
-import { ConnectedDevice } from "@api/transport/model/ConnectedDevice";
 import {
   ConnectUseCaseArgs,
   DisconnectUseCaseArgs,
@@ -22,6 +21,7 @@ import {
   SendApduUseCaseArgs,
   StartDiscoveringUseCaseArgs,
 } from "@api/types";
+import { ConnectedDevice } from "@api/transport/model/ConnectedDevice";
 import { configTypes } from "@internal/config/di/configTypes";
 import { GetSdkVersionUseCase } from "@internal/config/use-case/GetSdkVersionUseCase";
 import { deviceSessionTypes } from "@internal/device-session/di/deviceSessionTypes";
