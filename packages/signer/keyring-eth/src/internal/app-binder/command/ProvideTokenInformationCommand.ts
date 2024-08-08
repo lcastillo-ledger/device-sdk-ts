@@ -3,11 +3,13 @@ import {
   Apdu,
   ApduBuilder,
   ApduBuilderArgs,
-  ApduParser,
   ApduResponse,
   Command,
+  CommandResult,
+  CommandResultFactory,
   CommandUtils,
-  InvalidStatusWordError,
+  GlobalCommandErrorHandler,
+  GlobalCommandErrorStatusCode,
 } from "@ledgerhq/device-sdk-core";
 
 export type ProvideTokenInformationCommandArgs = {
@@ -35,16 +37,14 @@ export class ProvideTokenInformationCommand
     return builder.build();
   }
 
-  parseResponse(response: ApduResponse): void {
-    const parser = new ApduParser(response);
-
-    // TODO: handle the error correctly using a generic error handler
+  parseResponse(
+    response: ApduResponse,
+  ): CommandResult<void, GlobalCommandErrorStatusCode> {
     if (!CommandUtils.isSuccessResponse(response)) {
-      throw new InvalidStatusWordError(
-        `Unexpected status word: ${parser.encodeToHexaString(
-          response.statusCode,
-        )}`,
-      );
+      return CommandResultFactory({
+        error: GlobalCommandErrorHandler.handle(response),
+      });
     }
+    return CommandResultFactory({ data: undefined });
   }
 }

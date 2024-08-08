@@ -1,4 +1,8 @@
-import { DeviceActionState, DeviceSdk } from "@ledgerhq/device-sdk-core";
+import {
+  CommandResultFactory,
+  DeviceActionState,
+  DeviceSdk,
+} from "@ledgerhq/device-sdk-core";
 import { DeviceActionStatus } from "@ledgerhq/device-sdk-core";
 import { SendCommandInAppDeviceAction } from "@ledgerhq/device-sdk-core";
 import { UserInteractionRequired } from "@ledgerhq/device-sdk-core";
@@ -34,7 +38,9 @@ describe("EthAppBinder", () => {
         observable: from([
           {
             status: DeviceActionStatus.Completed,
-            output: { address, publicKey, chainCode },
+            output: CommandResultFactory({
+              data: { address, publicKey, chainCode },
+            }),
           } as DeviceActionState<
             GetAddressDAOutput,
             GetAddressDAError,
@@ -68,7 +74,9 @@ describe("EthAppBinder", () => {
             expect(states).toEqual([
               {
                 status: DeviceActionStatus.Completed,
-                output: { address, publicKey, chainCode },
+                output: CommandResultFactory({
+                  data: { address, publicKey, chainCode },
+                }),
               },
             ]);
             done();
