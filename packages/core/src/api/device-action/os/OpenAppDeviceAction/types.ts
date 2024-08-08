@@ -1,11 +1,12 @@
+import { OpenAppErrorCodes } from "@api/command/os/OpenAppCommand";
+import { GlobalCommandErrorStatusCode } from "@api/command/utils/GlobalCommandError";
 import { DeviceActionState } from "@api/device-action/model/DeviceActionState";
 import { UserInteractionRequired } from "@api/device-action/model/UserInteractionRequired";
 import {
   DeviceLockedError,
   DeviceNotOnboardedError,
-  UnknownDAError,
 } from "@api/device-action/os/Errors";
-import { SdkError } from "@api/Error";
+import { DeviceExchangeError, SdkError } from "@api/Error";
 
 export type OpenAppDAOutput = void;
 
@@ -16,8 +17,8 @@ export type OpenAppDAInput = {
 export type OpenAppDAError =
   | DeviceNotOnboardedError
   | DeviceLockedError
-  | UnknownDAError
-  | SdkError; /// TODO: remove, we should have an exhaustive list of errors
+  | DeviceExchangeError<OpenAppErrorCodes | GlobalCommandErrorStatusCode>
+  | SdkError;
 
 type OpenAppDARequiredInteraction =
   | UserInteractionRequired.None

@@ -23,6 +23,9 @@ export type GetAppAndVersionResponse = {
   readonly flags?: number | Uint8Array;
 };
 
+export type GetAppAndVersionParseResult =
+  CommandResult<GetAppAndVersionResponse>;
+
 /**
  * Command to get information about the application currently running on the
  * device.
