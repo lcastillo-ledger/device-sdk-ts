@@ -28,12 +28,11 @@ export {
   type ListAppsResponse,
 } from "./command/os/ListAppsCommand";
 export { type OpenAppArgs, OpenAppCommand } from "./command/os/OpenAppCommand";
+export { isCommandErrorCode } from "./command/utils/CommandErrors";
 export { CommandUtils } from "./command/utils/CommandUtils";
 export {
   GlobalCommandError,
   GlobalCommandErrorHandler,
-  type GlobalCommandErrorStatusCode,
-  isCommandErrorCode,
 } from "./command/utils/GlobalCommandError";
 export { DeviceModel, DeviceModelId } from "./device/DeviceModel";
 export { DeviceStatus } from "./device/DeviceStatus";
