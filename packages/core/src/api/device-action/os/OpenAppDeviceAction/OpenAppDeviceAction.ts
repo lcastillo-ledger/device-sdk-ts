@@ -8,7 +8,7 @@ import {
 } from "@api/command/os/CloseAppCommand";
 import {
   GetAppAndVersionCommand,
-  GetAppAndVersionParseResult as GetAppAndVersionResult,
+  GetAppAndVersionCommandResult,
 } from "@api/command/os/GetAppAndVersionCommand";
 import { OpenAppCommand } from "@api/command/os/OpenAppCommand";
 import { DeviceStatus } from "@api/device/DeviceStatus";
@@ -38,7 +38,7 @@ type OpenAppStateMachineInternalState = {
 };
 
 export type MachineDependencies = {
-  readonly getAppAndVersion: () => Promise<GetAppAndVersionResult>;
+  readonly getAppAndVersion: () => Promise<GetAppAndVersionCommandResult>;
   readonly closeApp: () => Promise<CloseAppCommandResult>;
   readonly openApp: (arg0: {
     input: { appName: string };

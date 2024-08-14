@@ -1,3 +1,5 @@
+import { ListAppsCommandErrorCodes } from "@api/command/os/ListAppsCommand";
+import { GlobalCommandErrorStatusCode } from "@api/command/utils/GlobalCommandError";
 import { DeviceActionState } from "@api/device-action/model/DeviceActionState";
 import { UserInteractionRequired } from "@api/device-action/model/UserInteractionRequired";
 import { UnknownDAError } from "@api/device-action/os/Errors";
@@ -6,7 +8,7 @@ import {
   ListAppsDAInput,
   ListAppsDAIntermediateValue,
 } from "@api/device-action/os/ListApps/types";
-import { SdkError } from "@api/Error";
+import { DeviceExchangeError, SdkError } from "@api/Error";
 import { Application } from "@internal/manager-api/model/ManagerApiType";
 
 export type ListAppsWithMetadataDAOutput = Array<Application | null>;
@@ -15,6 +17,9 @@ export type ListAppsWithMetadataDAInput = ListAppsDAInput;
 export type ListAppsWithMetadataDAError =
   | ListAppsDAError
   | UnknownDAError
+  | DeviceExchangeError<
+      ListAppsCommandErrorCodes | GlobalCommandErrorStatusCode
+    >
   | SdkError; /// TODO: remove, we should have an exhaustive list of errors
 
 export type ListAppsWithMetadataDARequiredInteraction =

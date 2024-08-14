@@ -32,10 +32,7 @@ export class OpenAppCommandError extends DeviceExchangeError<OpenAppErrorCodes> 
   }
 }
 
-export type OpenAppCommandResultType = CommandResult<
-  void,
-  OpenAppErrorCodes | GlobalCommandErrorStatusCode
->;
+export type OpenAppCommandResultType = CommandResult<void, OpenAppErrorCodes>;
 
 /**
  * The command to open an application on the device.

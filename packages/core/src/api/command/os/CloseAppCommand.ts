@@ -9,10 +9,7 @@ import { CommandUtils } from "@api/command/utils/CommandUtils";
 import { GlobalCommandErrorHandler } from "@api/command/utils/GlobalCommandError";
 import { ApduResponse } from "@api/device-session/ApduResponse";
 
-export type CloseAppCommandResult = CommandResult<
-  void,
-  GlobalCommandErrorStatusCode
->;
+export type CloseAppCommandResult = CommandResult<void>;
 
 /**
  * The command to close a runnint application on the device.

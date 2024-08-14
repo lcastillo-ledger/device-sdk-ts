@@ -23,8 +23,6 @@ export type AppResponse = {
   readonly appName: string;
 };
 
-export type ListAppsResponse = AppResponse[];
-
 export type ListAppsArgs = {
   readonly isContinue: boolean;
 };
@@ -34,6 +32,13 @@ export type ListAppsCommandErrorCodes = "6624";
 const LIST_APP_ERRORS: CommandErrors<ListAppsCommandErrorCodes> = {
   "6624": { message: "Invalid state (List applications command must be sent)" },
 };
+
+export type ListAppsResponse = AppResponse[];
+
+export type ListAppsCommandResult = CommandResult<
+  ListAppsResponse,
+  ListAppsCommandErrorCodes
+>;
 
 export class ListAppsCommandError extends DeviceExchangeError<ListAppsCommandErrorCodes> {
   constructor({
@@ -45,7 +50,7 @@ export class ListAppsCommandError extends DeviceExchangeError<ListAppsCommandErr
 }
 
 export class ListAppsCommand
-  implements Command<ListAppsResponse, ListAppsCommandErrorCodes, ListAppsArgs>
+  implements Command<AppResponse[], ListAppsCommandErrorCodes, ListAppsArgs>
 {
   readonly args: ListAppsArgs;
 
@@ -63,10 +68,8 @@ export class ListAppsCommand
     return new ApduBuilder(listAppApduArgs).build();
   }
 
-  parseResponse(
-    apduResponse: ApduResponse,
-  ): CommandResult<ListAppsResponse, ListAppsCommandErrorCodes> {
-    const res: ListAppsResponse = [];
+  parseResponse(apduResponse: ApduResponse): ListAppsCommandResult {
+    const res = [];
     const parser = new ApduParser(apduResponse);
 
     if (!CommandUtils.isSuccessResponse(apduResponse)) {

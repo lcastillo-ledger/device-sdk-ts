@@ -23,8 +23,9 @@ export type GetAppAndVersionResponse = {
   readonly flags?: number | Uint8Array;
 };
 
-export type GetAppAndVersionParseResult =
-  CommandResult<GetAppAndVersionResponse>;
+export type GetAppAndVersionCommandResult = CommandResult<
+  GetAppAndVersionResponse
+>;
 
 /**
  * Command to get information about the application currently running on the
@@ -45,9 +46,7 @@ export class GetAppAndVersionCommand
     return new ApduBuilder(getAppAndVersionApduArgs).build();
   }
 
-  parseResponse(
-    apduResponse: ApduResponse,
-  ): CommandResult<GetAppAndVersionResponse> {
+  parseResponse(apduResponse: ApduResponse): GetAppAndVersionCommandResult {
     if (!CommandUtils.isSuccessResponse(apduResponse)) {
       return CommandResultFactory({
         error: GlobalCommandErrorHandler.handle(apduResponse),
