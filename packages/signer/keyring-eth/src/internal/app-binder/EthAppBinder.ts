@@ -6,6 +6,7 @@ import { inject, injectable } from "inversify";
 
 import { GetAddressDAReturnType } from "@api/app-binder/GetAddressDeviceActionTypes";
 import { SignTypedDataDAReturnType } from "@api/app-binder/SignTypedDataDeviceActionTypes";
+import { Transaction } from "@api/model/Transaction";
 import { TypedData } from "@api/model/TypedData";
 import { SignTypedDataDeviceAction } from "@internal/app-binder/device-action/SignTypedData/SignTypedDataDeviceAction";
 import { externalTypes } from "@internal/externalTypes";
@@ -60,6 +61,19 @@ export class EthAppBinder {
           derivationPath: args.derivationPath,
           data: args.data,
           parser: args.parser,
+          contextModule: this._contextModule,
+        },
+      }),
+    });
+  }
+
+  signTransaction(args: { derivationPath: string; transaction: Transaction }) {
+    return this._sdk.executeDeviceAction({
+      sessionId: this._sessionId,
+      deviceAction: new SignTransactionDeviceAction({
+        input: {
+          derivationPath: args.derivationPath,
+          transaction: args.transaction,
           contextModule: this._contextModule,
         },
       }),
