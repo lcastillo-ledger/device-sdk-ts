@@ -9,7 +9,7 @@ import { useMockServerContext } from "@/providers/MockServerProvider";
 
 const defaultSdk = new DeviceSdkBuilder()
   .addLogger(new ConsoleLogger())
-  .addTransport(BuiltinTransports.USB)
+  .addTransport(BuiltinTransports.BLE)
   .build();
 
 const SdkContext = createContext<DeviceSdk>(defaultSdk);
