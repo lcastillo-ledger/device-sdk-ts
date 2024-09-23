@@ -8,7 +8,8 @@ import { Device } from "@/components/Device";
 import { Menu } from "@/components/Menu";
 import { useSdk } from "@/providers/DeviceSdkProvider";
 import { useDeviceSessionsContext } from "@/providers/DeviceSessionsProvider";
-import { useMockServerContext } from "@/providers/MockServerProvider";
+import { useSdkConfigContext } from "../../providers/SdkConfig";
+import { BuiltinTransports } from "@ledgerhq/device-management-kit";
 
 const Root = styled(Flex).attrs({ py: 8, px: 6 })`
   flex-direction: column;
@@ -57,8 +58,8 @@ export const Sidebar: React.FC = () => {
     dispatch,
   } = useDeviceSessionsContext();
   const {
-    state: { enabled: mockServerEnabled },
-  } = useMockServerContext();
+    state: { transport },
+  } = useSdkConfigContext();
 
   useEffect(() => {
     sdk
@@ -83,7 +84,7 @@ export const Sidebar: React.FC = () => {
 
   const router = useRouter();
   return (
-    <Root mockServerEnabled={mockServerEnabled}>
+    <Root mockServerEnabled={transport === BuiltinTransports.MOCK_SERVER}>
       <Link
         onClick={() => router.push("/")}
         mb={8}
@@ -93,7 +94,7 @@ export const Sidebar: React.FC = () => {
         }}
       >
         Ledger Device Management Kit
-        {mockServerEnabled && <span> (MOCKED)</span>}
+        {transport === BuiltinTransports.MOCK_SERVER && <span> (MOCKED)</span>}
       </Link>
       <Subtitle variant={"small"}>
         SDK Version: {version ? version : "Loading..."}

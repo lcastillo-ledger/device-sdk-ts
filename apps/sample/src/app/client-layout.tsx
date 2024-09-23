@@ -18,7 +18,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { SdkProvider } from "@/providers/DeviceSdkProvider";
 import { DeviceSessionsProvider } from "@/providers/DeviceSessionsProvider";
 import { GlobalStyle } from "@/styles/globalstyles";
-import { MockServerProvider } from "@/providers/MockServerProvider";
+import { SdkConfigProvider } from "../providers/SdkConfig";
 
 type ClientRootLayoutProps = {
   children: React.ReactNode;
@@ -41,7 +41,7 @@ const PageContainer = styled(Flex)`
 const ClientRootLayout: React.FC<ClientRootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
-      <MockServerProvider>
+      <SdkConfigProvider>
         <SdkProvider>
           <StyleProvider selectedPalette="dark" fontsPath="/fonts">
             <GlobalStyle />
@@ -58,7 +58,7 @@ const ClientRootLayout: React.FC<ClientRootLayoutProps> = ({ children }) => {
             </body>
           </StyleProvider>
         </SdkProvider>
-      </MockServerProvider>
+      </SdkConfigProvider>
     </html>
   );
 };
