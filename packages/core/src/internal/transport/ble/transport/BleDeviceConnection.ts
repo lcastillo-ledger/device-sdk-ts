@@ -150,6 +150,9 @@ export class BleDeviceConnection implements DeviceConnection {
       Right: (maybeApduResponse) => {
         maybeApduResponse.map((apduResponse) => {
           this._sendApduSubject.next(apduResponse);
+          this._logger.debug("Received APDU Response", {
+            data: { response: apduResponse },
+          });
           this._sendApduSubject.complete();
         });
       },
@@ -203,6 +206,9 @@ export class BleDeviceConnection implements DeviceConnection {
     });
     for (const frame of frames) {
       try {
+        this._logger.debug("Sending Frame", {
+          data: { frame: frame.getRawData() },
+        });
         await this._writeCharacteristic.writeValueWithResponse(
           frame.getRawData(),
         );
