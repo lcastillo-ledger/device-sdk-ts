@@ -39,5 +39,5 @@ export const SessionIdWrapper: React.FC<{
     );
   }
 
-  return <ChildComponent sessionId={sessionId} />;
+  return <ChildComponent key={sessionId} sessionId={sessionId} />;
 };
