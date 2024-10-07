@@ -239,11 +239,12 @@ export class BleDeviceConnection implements DeviceConnection {
    * @private
    */
   private isDataViewEvent(event: Event): event is DataViewEvent {
-    return (
-      event.target !== null &&
-      "value" in event.target &&
-      event.target.value instanceof DataView
-    );
+    return event?.target?.value instanceof DataView ?? false;
+    // return (
+    //   event.target !== null &&
+    //   "value" in event.target &&
+    //   event.target.value instanceof DataView
+    // );
   }
 
   /**
