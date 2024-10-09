@@ -3,7 +3,10 @@ import {
   LogLevel,
   type LogParams,
 } from "@ledgerhq/device-management-kit";
-import { ReplaySubject } from "rxjs";
+import { FlipperPluginConnection } from "js-flipper";
+import { ReplaySubject, Subscription } from "rxjs";
+
+import { FlipperPluginManager } from "./FlipperPluginManager";
 
 export type FlipperObjLog = {
   /** ISO 8601 timestamp */
@@ -68,11 +71,38 @@ export class FlipperSdkLogger implements LoggerSubscriberService {
    */
   private logsSubject = new ReplaySubject<FlipperObjLog>();
 
-  log(...logParams: LogParams) {
-    this.logsSubject.next(mapSdkLogToFlipperObjLog(logParams));
+  constructor(
+    flipperPluginManager: FlipperPluginManager = FlipperPluginManager.getInstance(),
+  ) {
+    const flipperPluginConnection =
+      flipperPluginManager.getFlipperPluginConnection();
+    if (flipperPluginConnection) {
+      this.onConnectFlipperPlugin(flipperPluginConnection);
+    }
+    flipperPluginManager.addConnectListener(
+      this.onConnectFlipperPlugin.bind(this),
+    );
+    flipperPluginManager.addDisconnectListener(
+      this.onDisconnectFlipperPlugin.bind(this),
+    );
   }
 
-  subscribeToLogs(callback: (log: FlipperObjLog) => void) {
-    return this.logsSubject.subscribe(callback);
+  private activeSubscription: Subscription | null = null;
+
+  private onConnectFlipperPlugin(
+    flipperPluginConnection: FlipperPluginConnection,
+  ) {
+    this.activeSubscription?.unsubscribe(); // NOTE: this cleanup is necessary to avoid sending double events on reconnection (in cases onDisconnect has not been called)
+    this.logsSubject.subscribe((log) => {
+      flipperPluginConnection.send("addLog", log);
+    });
+  }
+
+  private onDisconnectFlipperPlugin() {
+    this.activeSubscription?.unsubscribe();
+  }
+
+  public log(...logParams: LogParams) {
+    this.logsSubject.next(mapSdkLogToFlipperObjLog(logParams));
   }
 }

@@ -1,6 +1,10 @@
 import { LogLevel, LogParams } from "@ledgerhq/device-management-kit";
+import { type FlipperPluginConnection } from "js-flipper";
 
+import { FlipperPluginManager } from "./FlipperPluginManager";
 import { FlipperObjLog, FlipperSdkLogger } from "./FlipperSdkLogger";
+
+jest.mock("js-flipper");
 
 const testLogs: LogParams[] = [
   [
@@ -63,7 +67,7 @@ const expectedFlipperLogs: FlipperObjLog[] = [
     verbosity: "debug",
     message: "Test info log",
     payloadJSON:
-      '{"apdu":{"hex":"0xb0010000", "readableHex":"b0 01 00 00", "value":[176,1,0,0]}',
+      '{"apdu":{"hex":"0xb0010000","readableHex":"b0 01 00 00","value":[176,1,0,0]}}',
   },
   {
     timestamp: "1970-01-01T00:00:00.001Z",
@@ -94,25 +98,40 @@ const expectedFlipperLogs: FlipperObjLog[] = [
     payloadJSON: '{"key":"value"}',
   },
 ];
+const expectedFlipperMessages = expectedFlipperLogs.map((log) => ({
+  method: "addLog",
+  params: log,
+}));
 
 describe("FlipperSdkLogger", () => {
+  beforeEach(() => {});
   test("subscribeToLogs should return a subscription emitting all the logs, formatted", () => {
-    const logger = new FlipperSdkLogger();
+    const flipperPluginManager = FlipperPluginManager.getInstance();
 
-    // Logs emitted before the subscription
+    const logger = new FlipperSdkLogger(flipperPluginManager);
+
+    // Logs emitted before a Flipper connection is established
     for (const log of testLogs.slice(0, 2)) {
       logger.log(...log);
     }
 
-    const observedLogs: FlipperObjLog[] = [];
-    logger.subscribeToLogs((log) => observedLogs.push(log));
+    const observedFlipperMessages: { method: string; params?: unknown }[] = [];
 
-    // Logs emitted after the subscription
+    // Flipper connection established
+    const mockedFlipperConnection: FlipperPluginConnection = {
+      send: (method: string, params?: unknown) => {
+        if (method === "init") return; // ignore this
+        observedFlipperMessages.push({ method, params });
+      },
+      receive: () => {},
+    };
+    flipperPluginManager.onConnect(mockedFlipperConnection);
+
+    // Logs emitted after a Flipper connection is established
     for (const log of testLogs.slice(2)) {
       logger.log(...log);
     }
 
-    console.log(observedLogs);
-    expect(observedLogs).toEqual(expectedFlipperLogs);
+    expect(observedFlipperMessages).toEqual(expectedFlipperMessages);
   });
 });
