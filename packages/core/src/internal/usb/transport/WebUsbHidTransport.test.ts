@@ -30,12 +30,16 @@ const stubDevice: HIDDevice = hidDeviceStubBuilder();
 describe("WebUsbHidTransport", () => {
   let transport: WebUsbHidTransport;
 
-  beforeEach(() => {
+  function initializeTransport() {
     transport = new WebUsbHidTransport(
       usbDeviceModelDataSource,
       () => logger,
       usbHidDeviceConnectionFactoryStubBuilder(),
     );
+  }
+
+  beforeEach(() => {
+    initializeTransport();
     jest.useFakeTimers();
   });
 
@@ -79,22 +83,18 @@ describe("WebUsbHidTransport", () => {
     const disconnectionEventsSubject = new Subject<HIDConnectionEvent>();
 
     function emitHIDConnectionEvent(device: HIDDevice) {
-      if (global.navigator.hid.onconnect)
-        global.navigator.hid.onconnect({ device } as HIDConnectionEvent);
       connectionEventsSubject.next({
         device,
       } as HIDConnectionEvent);
     }
 
     function emitHIDDisconnectionEvent(device: HIDDevice) {
-      if (global.navigator.hid.ondisconnect)
-        global.navigator.hid.ondisconnect({ device } as HIDConnectionEvent);
       disconnectionEventsSubject.next({
         device,
       } as HIDConnectionEvent);
     }
 
-    beforeAll(() => {
+    beforeEach(() => {
       global.navigator = {
         hid: {
           getDevices: mockedGetDevices,
@@ -111,9 +111,10 @@ describe("WebUsbHidTransport", () => {
           },
         },
       } as unknown as Navigator;
+      initializeTransport();
     });
 
-    afterAll(() => {
+    afterEach(() => {
       jest.restoreAllMocks();
       global.navigator = undefined as unknown as Navigator;
     });
@@ -289,6 +290,7 @@ describe("WebUsbHidTransport", () => {
 
       it("should emit the same discoveredDevice object if its discovered twice in a row", async () => {
         mockedRequestDevice.mockResolvedValue([stubDevice]);
+        mockedGetDevices.mockResolvedValue([stubDevice]);
 
         const firstDiscoveredDevice = await new Promise((resolve, reject) => {
           discoverDevice(resolve, (err) => reject(err));
@@ -300,11 +302,11 @@ describe("WebUsbHidTransport", () => {
       });
     });
 
-    describe("stopDiscovering", () => {
+    describe("destroy", () => {
       it("should stop monitoring connections if the discovery process is halted", () => {
         const abortSpy = jest.spyOn(AbortController.prototype, "abort");
 
-        transport.stopDiscovering();
+        transport.destroy();
 
         expect(abortSpy).toHaveBeenCalled();
       });
@@ -339,14 +341,14 @@ describe("WebUsbHidTransport", () => {
 
       it("should throw OpeningConnectionError if the device cannot be opened", (done) => {
         const message = "cannot be opened";
-        mockedRequestDevice.mockResolvedValueOnce([
-          {
-            ...stubDevice,
-            open: () => {
-              throw new Error(message);
-            },
+        const mockedDevice = {
+          ...stubDevice,
+          open: () => {
+            throw new Error(message);
           },
-        ]);
+        };
+        mockedRequestDevice.mockResolvedValueOnce([mockedDevice]);
+        mockedGetDevices.mockResolvedValue([mockedDevice]);
 
         discoverDevice(
           (discoveredDevice) => {
@@ -372,15 +374,17 @@ describe("WebUsbHidTransport", () => {
       });
 
       it("should return the opened device", (done) => {
-        mockedRequestDevice.mockResolvedValueOnce([
-          {
-            ...stubDevice,
-            opened: true,
-            open: () => {
-              throw new DOMException("already opened", "InvalidStateError");
-            },
+        const mockedDevice = {
+          ...stubDevice,
+          opened: false,
+          open: () => {
+            mockedDevice.opened = true;
+            return Promise.resolve();
           },
-        ]);
+        };
+
+        mockedRequestDevice.mockResolvedValue([mockedDevice]);
+        mockedGetDevices.mockResolvedValue([mockedDevice]);
 
         discoverDevice(
           (discoveredDevice) => {
@@ -413,6 +417,7 @@ describe("WebUsbHidTransport", () => {
 
       it("should return a device if available", (done) => {
         mockedRequestDevice.mockResolvedValueOnce([stubDevice]);
+        mockedGetDevices.mockResolvedValue([stubDevice]);
 
         discoverDevice(
           (discoveredDevice) => {
@@ -538,6 +543,7 @@ describe("WebUsbHidTransport", () => {
         const hidDevice2 = hidDeviceStubBuilder();
 
         mockedRequestDevice.mockResolvedValueOnce([hidDevice1]);
+        mockedGetDevices.mockResolvedValue([hidDevice1, hidDevice2]);
 
         discoverDevice(async (discoveredDevice) => {
           try {
@@ -576,6 +582,11 @@ describe("WebUsbHidTransport", () => {
         const hidDevice3 = hidDeviceStubBuilder();
 
         mockedRequestDevice.mockResolvedValueOnce([hidDevice1]);
+        mockedGetDevices.mockResolvedValue([
+          hidDevice1,
+          hidDevice2,
+          hidDevice3,
+        ]);
 
         // when
         discoverDevice(async (discoveredDevice) => {

@@ -54,10 +54,11 @@ export const MainView: React.FC = () => {
   }, [sdk, dispatch]);
 
   useEffect(() => {
-    return () => {
-      // Example cleaning up the discovery
-      sdk.stopDiscovering();
-    };
+    console.log("🦖 MainView mounted");
+  }, []);
+
+  useEffect(() => {
+    console.log("🦖 useEffect SDK");
   }, [sdk]);
 
   return (

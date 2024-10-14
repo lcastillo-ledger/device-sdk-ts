@@ -15,5 +15,6 @@ export type InternalDiscoveredDevice = {
    * privacy feature of Ledger devices.
    */
   id: DeviceId;
+  hidDevice: HIDDevice;
   deviceModel: InternalDeviceModel;
 };

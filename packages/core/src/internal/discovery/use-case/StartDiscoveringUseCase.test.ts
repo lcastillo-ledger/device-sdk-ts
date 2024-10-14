@@ -22,6 +22,7 @@ describe("StartDiscoveringUseCase", () => {
       id: "nanoSP" as DeviceModelId,
       productName: "productName",
     } as InternalDeviceModel,
+    hidDevice: {} as HIDDevice,
   };
   const tag = "logger-tag";
 

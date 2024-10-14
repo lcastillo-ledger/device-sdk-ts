@@ -52,5 +52,12 @@ describe("discoveryModuleFactory", () => {
 
     const connectUseCase = container.get(discoveryTypes.ConnectUseCase);
     expect(connectUseCase).toBeInstanceOf(ConnectUseCase);
+
+    const listenToKnownDevicesUseCase = container.get(
+      discoveryTypes.ListenToKnownDevicesUseCase,
+    );
+    expect(listenToKnownDevicesUseCase).toBeInstanceOf(
+      listenToKnownDevicesUseCase,
+    );
   });
 });

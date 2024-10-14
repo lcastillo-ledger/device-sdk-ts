@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { createContext, PropsWithChildren, useContext } from "react";
 import {
   ConsoleLogger,
@@ -7,25 +7,43 @@ import {
   WebLogsExporterLogger,
 } from "@ledgerhq/device-management-kit";
 
-const webLogsExporterLogger = new WebLogsExporterLogger();
-
-export const sdk = new DeviceSdkBuilder()
-  .addLogger(new ConsoleLogger())
-  .addLogger(webLogsExporterLogger)
-  .build();
-
-const SdkContext = createContext<DeviceSdk>(sdk);
+const SdkContext = createContext<DeviceSdk | null>(null);
+const LogsExporterContext = createContext<WebLogsExporterLogger | null>(null);
 
 export const SdkProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  return <SdkContext.Provider value={sdk}>{children}</SdkContext.Provider>;
+  const [state] = useState(() => {
+    const logsExporter = new WebLogsExporterLogger();
+    const sdk = new DeviceSdkBuilder()
+      .addLogger(new ConsoleLogger())
+      .addLogger(logsExporter)
+      .build();
+    return { sdk, logsExporter };
+  });
+
+  return (
+    <SdkContext.Provider value={state.sdk}>
+      <LogsExporterContext.Provider value={state.logsExporter}>
+        {children}
+      </LogsExporterContext.Provider>
+    </SdkContext.Provider>
+  );
 };
 
 export const useSdk = (): DeviceSdk => {
-  return useContext(SdkContext);
+  const sdk = useContext(SdkContext);
+  if (sdk === null)
+    throw new Error("useSdk must be used within a SdkContext.Provider");
+  return sdk;
 };
 
 export function useExportLogsCallback() {
+  const logsExporter = useContext(LogsExporterContext);
+  if (logsExporter === null) {
+    throw new Error(
+      "useExportLogsCallback must be used within LogsExporterContext.Provider",
+    );
+  }
   return useCallback(() => {
-    webLogsExporterLogger.exportLogsToJSON();
-  }, []);
+    logsExporter.exportLogsToJSON();
+  }, [logsExporter]);
 }
